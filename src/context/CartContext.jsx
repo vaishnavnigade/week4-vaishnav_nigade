@@ -72,3 +72,29 @@ export const useCart = () => {
   if (!ctx) throw new Error("useCart must be used within a CartProvider");
   return ctx;
 };
+
+const normalizeItem = (raw) => {
+  const product = raw.product || {};
+  return {
+    id: raw.id, // cart_item_id
+    product_id: product.id ?? raw.product_id,
+    name: product.name ?? raw.name,
+    price: parseFloat(product.price ?? raw.price ?? 0),
+    stock: product.stock ?? raw.stock,
+    quantity: raw.quantity,
+  };
+};
+
+// Replace the body of refreshCart with:
+const refreshCart = useCallback(async () => {
+  setLoading(true);
+  try {
+    const data = await getCart();
+    setItems(data.map(normalizeItem)); // normalise every line
+    setError("");
+  } catch (err) {
+    setError(err.message);
+  } finally {
+    setLoading(false);
+  }
+}, []);

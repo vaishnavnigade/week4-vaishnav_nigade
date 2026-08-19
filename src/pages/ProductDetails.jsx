@@ -1,15 +1,24 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getProductById } from "../api/productService";
+import { getProductById, getCategoryById } from "../api/productService";
 
 const ProductDetails = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
+  const [category, setCategory] = useState("");
   const [error, setError] = useState("");
 
   useEffect(() => {
-    getProductById(id).then(setProduct).catch((err) => setError(err.message));
+    getProductById(id)
+      .then(async (p) => {
+        setProduct(p);
+        if (p.category_id) {
+          const c = await getCategoryById(p.category_id).catch(() => null);
+          if (c) setCategory(c.name);
+        }
+      })
+      .catch((err) => setError(err.message));
   }, [id]);
 
   if (error) return <p className="error-text">{error}</p>;
@@ -18,10 +27,10 @@ const ProductDetails = () => {
   return (
     <article className="product-details">
       <h2>{product.name}</h2>
-      <p className="category">Category: {product.category}</p>
-      <p className="price">Price: ₹{product.price}</p>
+      <p className="category">Category: {category || "Uncategorised"}</p>
+      <p className="price">Price: ₹{parseFloat(product.price).toFixed(2)}</p>
       <p>{product.description}</p>
-      <p>{product.quantity > 0 ? `In stock: ${product.quantity}` : "Out of Stock"}</p>
+      <p>{product.stock > 0 ? `In stock: ${product.stock}` : "Out of Stock"}</p>
     </article>
   );
 };

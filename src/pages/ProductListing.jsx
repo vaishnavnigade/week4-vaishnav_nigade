@@ -1,36 +1,59 @@
 
 import { useEffect, useMemo, useState } from "react";
-import { getProducts } from "../api/productService";
+import { getProducts, getCategoryById } from "../api/productService";
+import { useCart } from "../context/CartContext";
 import ProductCard from "../components/product/ProductCard";
 
 const ProductListing = () => {
+  const { add } = useCart();
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState({}); // { [category_id]: name }
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Fetch the catalogue once on mount.
+  // Fetch products, then resolve the unique category ids to names for display/search.
   useEffect(() => {
-    getProducts()
-      .then(setProducts)
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+    const load = async () => {
+      try {
+        const data = await getProducts();
+        setProducts(data);
+
+        const ids = [...new Set(data.map((p) => p.category_id).filter(Boolean))];
+        const results = await Promise.all(
+          ids.map((id) =>
+            getCategoryById(id)
+              .then((c) => [id, c.name])
+              .catch(() => [id, ""]) // tolerate a missing category
+          )
+        );
+        setCategories(Object.fromEntries(results));
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
   }, []);
 
-  // Filter by name OR category as the user types (memoised for performance).
+  // Filter by product name OR resolved category name as the user types.
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
     if (!term) return products;
-    return products.filter(
-      (p) =>
-        p.name.toLowerCase().includes(term) ||
-        (p.category || "").toLowerCase().includes(term)
-    );
-  }, [products, search]);
+    return products.filter((p) => {
+      const catName = (categories[p.category_id] || "").toLowerCase();
+      return p.name.toLowerCase().includes(term) || catName.includes(term);
+    });
+  }, [products, categories, search]);
 
-  // Placeholder until Milestone 3 wires the cart context.
-  const handleAddToCart = (product) =>
-    console.log("TODO Milestone 3: add to cart", product.id);
+  const handleAddToCart = async (product) => {
+    try {
+      await add(product.id, 1);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
   if (loading) return <p>Loading products...</p>;
   if (error) return <p className="error-text">{error}</p>;
@@ -53,6 +76,7 @@ const ProductListing = () => {
             <ProductCard
               key={product.id}
               product={product}
+              categoryName={categories[product.category_id]}
               onAddToCart={handleAddToCart}
             />
           ))}

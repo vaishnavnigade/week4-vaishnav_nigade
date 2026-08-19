@@ -2,15 +2,15 @@
 import { Link } from "react-router-dom";
 import Button from "../common/Button";
 
-// Reusable card: shows required details and disables Add to Cart when stock <= 0.
-const ProductCard = ({ product, onAddToCart }) => {
-  const inStock = product.quantity > 0; // stock rule per case study
+// Reusable card; uses `stock` and a resolved category name (categoryName prop).
+const ProductCard = ({ product, categoryName, onAddToCart }) => {
+  const inStock = product.stock > 0; // actual stock field is `stock`
 
   return (
     <div className="product-card">
       <h3>{product.name}</h3>
-      <p className="category">{product.category}</p>
-      <p className="price">₹{product.price}</p>
+      <p className="category">{categoryName || "Uncategorised"}</p>
+      <p className="price">₹{parseFloat(product.price).toFixed(2)}</p>
 
       {inStock ? (
         <Button onClick={() => onAddToCart(product)}>Add to Cart</Button>
