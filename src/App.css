@@ -209,3 +209,25 @@ body {
   align-items: flex-start;
   padding: 48px 16px;
 }
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+}
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #86BC25;
+  color: #fff;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.user-name {
+  font-weight: 600;
+  color: #1a1a1a;
+}

@@ -1,15 +1,23 @@
-
 import { createContext, useContext, useState } from "react";
 import { loginUser, registerUser } from "../api/authService";
 
 const AuthContext = createContext(null);
 
+// Reads the payload inside the JWT (name/email are usually stored there).
+const decodeToken = (token) => {
+  try {
+    return JSON.parse(atob(token.split(".")[1]));
+  } catch {
+    return null;
+  }
+};
+
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(() => localStorage.getItem("token"));
+  const user = token ? decodeToken(token) : null;
 
   const register = (payload) => registerUser(payload);
 
-  // Store JWT so the axios interceptor attaches it to protected calls.
   const login = async (credentials) => {
     const data = await loginUser(credentials);
     localStorage.setItem("token", data.access_token);
@@ -22,7 +30,7 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
   };
 
-  const value = { token, isAuthenticated: !!token, register, login, logout };
+  const value = { token, user, isAuthenticated: !!token, register, login, logout };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
