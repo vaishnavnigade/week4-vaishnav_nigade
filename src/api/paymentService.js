@@ -1,8 +1,13 @@
-
 import axiosClient from "./axiosClient";
-
-// POST /payments/process — amount in paise, currency, and a gateway token.
-export const processPayment = (amountCents, token, currency = "INR") =>
-  axiosClient
-    .post("/payments/process", { amount_cents: amountCents, currency, token })
-    .then((res) => res.data);
+ 
+// body likely { order_id, ... } — confirm in Swagger
+export const makePayment = (data) =>
+  axiosClient.post("/api/payments/process", data).then((r) => r.data);
+ 
+export const getBreakerStatus = () =>
+  axiosClient.get("/api/payments/breaker_status").then((r) => r.data);
+ 
+// aliases
+export const processPayment = makePayment;
+export const pay = makePayment;
+ 
