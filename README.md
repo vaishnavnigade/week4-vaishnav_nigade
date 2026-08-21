@@ -316,21 +316,7 @@ Reusable UI lives under `components/common`, with feature-specific pieces in `co
 
 ---
 
-## Milestones & Evaluation
 
-| #  | Milestone Description                                        | Status   |
-|----|-------------------------------------------------------------|----------|
-| 1  | User Registration & Login with proper validations           | ✅ / 🚧 |
-| 2  | Product listing & search components with validations        | ✅ / 🚧 |
-| 3  | Cart management functionality                               | ✅ / 🚧 |
-| 4  | Viewing the order history                                   | ✅ / 🚧 |
-| 5  | Order placement and order history                           | ✅ / 🚧 |
-| 6  | Push the build to the GitHub repository                     | ✅ / 🚧 |
-| —  | Technical Interview / Viva — final testing & documentation  | 🚧       |
-
-> Flip each ✅ / 🚧 to match what you've completed.
-
----
 
 ## Best Practices Followed
 
